@@ -9,9 +9,13 @@ global with sharing class GetRecordsInCollection {
          
         Map<String,List<FlowInput>> FieldNameToInputs = new Map<String,List<FlowInput>>();
         Map<String, Set<String>> fieldNameToValidValues = new Map<String, Set<String>> ();
+        Set<String> objNames = new Set<String>(); 
         Set<String> allReturnFields = new Set<String>();
         
         for(FlowInput input : inputs){
+            //add object name to a set, used to validate input
+            objNames.add(input.objectName); 
+            
             // add the valid field values for this input to a map of field name to a set of valid values
             if (!fieldNameToValidValues.containsKey(input.bindField)){
                 fieldNameToValidValues.put(input.bindField, new Set<String>());
@@ -28,6 +32,8 @@ global with sharing class GetRecordsInCollection {
             //add all the return fields to a set (in case different interviews request different fields)
             allReturnFields.addAll(input.returnFields);
         }
+        
+        validateInputs(objNames); //throw an error if there's an issue, otherwise continue
        
         //now build the soql
         String theSoql = buildSoql(inputs, allReturnFields, fieldNameToValidValues);
@@ -115,6 +121,11 @@ global with sharing class GetRecordsInCollection {
         return theSoql;
     }
    
+    static void validateInputs(Set<String> objNames){
+        if (objNames.size() != 1) throw new IllegalArgumentException ('All records must have the same object name');
+        String objName = new List<String> (objNames)[0];
+        if (Type.forName(objName) == null) throw new IllegalArgumentException (objName + ' is not a valid object');
+    }
    
     global class FlowInput {
         @InvocableVariable(required=true)
