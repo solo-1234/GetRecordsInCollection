@@ -30,29 +30,7 @@ global with sharing class GetRecordsInCollection {
         }
        
         //now build the soql
-        String theSoql = 'SELECT ' +  String.join(new List<String>(allReturnFields), ', ');
-        theSoql += ' FROM ' + inputs[0].objectName; //we can take the object name from the first input in our list, since they will all be the same anyways
-		//now the fun part - the WHERE! If there is only one bind field, it's simpler. If there are multiple, each needs to be in parens and split with OR
-        theSoql += ' WHERE ';
-        //loop through each bind field
-        List <String> inClauses = new List <String> ();
-        for (String bindField : fieldNameToValidValues.keySet()){
-            String clause = bindField + ' IN (';
-            List <String> textValues = new List<String> ();
-            for (String value :fieldNameToValidValues.get(bindField) ){
-                textValues.add('\''+ value + '\'');
-            }
-            clause += String.join(textValues, ', ') + ')';
-            
-            //if there is more than one bind field, each clause needs to be wrapped in parens
-            if(fieldNameToValidValues.size() > 1){
-                clause = '(' + clause + ')';
-            }
-            inClauses.add(clause);
-        }
-        
-        theSoql += String.join(inClauses,', ');
-        System.debug('>>>> will fetch these records: ' + theSoql);
+        String theSoql = buildSoql(inputs, allReturnFields, fieldNameToValidValues);
         
         //and fetch the records
         List <sObject> foundRecords = Database.query(theSoql);
@@ -108,6 +86,34 @@ global with sharing class GetRecordsInCollection {
         //right now it returns all return fields to all inputs, even if different inputs requested different fields. this might be just fine.
         return outputs;
     }
+    
+    static String buildSoql(List<FlowInput> inputs, Set<String> allReturnFields, Map<String,Set<String>> fieldNameToValidValues){
+        
+        String theSoql = 'SELECT ' +  String.join(new List<String>(allReturnFields), ', ');
+        theSoql += ' FROM ' + inputs[0].objectName; //we can take the object name from the first input in our list, since they will all be the same anyways
+        //now the fun part - the WHERE! If there is only one bind field, it's simpler. If there are multiple, each needs to be in parens and split with OR
+        theSoql += ' WHERE ';
+        //loop through each bind field
+        List <String> inClauses = new List <String> ();
+        for (String bindField : fieldNameToValidValues.keySet()){
+            String clause = bindField + ' IN (';
+            List <String> textValues = new List<String> ();
+            for (String value :fieldNameToValidValues.get(bindField) ){
+                textValues.add('\''+ value + '\'');
+            }
+            clause += String.join(textValues, ', ') + ')';
+            
+            //if there is more than one bind field, each clause needs to be wrapped in parens
+            if(fieldNameToValidValues.size() > 1){
+                clause = '(' + clause + ')';
+            }
+            inClauses.add(clause);
+        }
+        
+        theSoql += String.join(inClauses,', ');
+        System.debug('>>>> will fetch these records: ' + theSoql);
+        return theSoql;
+    }
    
    
     global class FlowInput {
@@ -123,7 +129,8 @@ global with sharing class GetRecordsInCollection {
         @InvocableVariable(required=true)
         global List<String> validTextCollection;
        
-	//it would be useful to be able to specify more filters, either in soql format or in field => value format      
+        private Integer counter;
+       
     }
    
     global class FlowOutput {
