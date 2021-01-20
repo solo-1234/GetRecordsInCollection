@@ -123,8 +123,7 @@ global with sharing class GetRecordsInCollection {
         @InvocableVariable(required=true)
         global List<String> validTextCollection;
        
-        private Integer counter;
-       
+	//it would be useful to be able to specify more filters, either in soql format or in field => value format      
     }
    
     global class FlowOutput {
