@@ -3,10 +3,6 @@ global with sharing class GetRecordsInCollection {
     @InvocableMethod
     global static List<FlowOutput> GetRecordsInCollection(List<FlowInput> inputs){
          
-        // this code does not account for the possiblity of one batch containing different objects. It needs to unless we can change the input variable to sObject,
-        // since that needs to be specified when adding the action to a flow
-        // either way, we do need to account for the (rare) possibility that one batch could contain different bind fields
-         
         Map<String,List<FlowInput>> fieldNameToInputs = new Map<String,List<FlowInput>>();
         Map<String, Set<String>> fieldNameToValidValues = new Map<String, Set<String>> ();
         Set<String> allReturnFields = new Set<String>();
@@ -28,26 +24,27 @@ global with sharing class GetRecordsInCollection {
             fieldNameToInputs.get(input.bindField).add(input);
             
             // add all the return fields to a set (in case different interviews request different fields)
+            // note that we will return all fields for all the records. 
+            // Most of the time, all the interviews will request the same fields. Even if not, the user is not likely to notice, and we don't anticipate performance issues.
             allReturnFields.addAll(input.returnFields);
         }
         
-        // now build the soql
+        // build the soql
         String theSoql = buildSoql(inputs, allReturnFields, fieldNameToValidValues);
         
         // and fetch the records
         List <sObject> foundRecords = Database.query(theSoql);
         System.debug('>>>> found records: ' + foundRecords.size());
-        // after fetching the records, loop through them.
-        // for each of our bind fields (objNameToInputs.keySet), prep a map of the valid text to all the records that match it
-        // so this will be a map of bind fields to a map of valid value to all the records that match it
-        // we'll loop through records, then bind fields, check if it has a row for the value it has in that field, and add it
+        
+        // we will need a map of bind fields to each requested value to the list of records that match it, so that we can assign the matching records to the corresponding input(s)
         Map <String, Map <String, List <sObject>>> bindFieldToValueToRecordsMap = new Map <String, Map <String, List <sObject>>> ();
         
-        // prepare a row for each bind field in bindFieldToValueToRecordsMap. We could really do this with an if within the next loop, but this way seems cleaner to me.
+        // prepare a row for each bind field in our map. We could really do this with an if within the next loop, but this way seems cleaner to me.
         for (String bindField : fieldNameToValidValues.keySet()){
             bindFieldToValueToRecordsMap.put(bindField, new Map <String, List <sObject>>());
         }
         
+        // for each record that was found, put its value for each requested bind field into the map
         for (sObject record : foundRecords){
             for (String bindField : fieldNameToValidValues.keySet()){
                 System.debug('>>>> bind field is ' + bindField + '. Will fetch value from record: ' + record);
@@ -61,14 +58,8 @@ global with sharing class GetRecordsInCollection {
             }
         }
         
-        // now we can loop through the original inputs
-        // for each input's find field
-        // find in bindFieldToValueToRecordsMap
-        // loop through the bind values from our input
-        // for each one, fetch any relevant rows from the Map <String, sObject>
-        // and add them to a temp list
-        // then add a new output with that temp list to our output list
-        // and do the next input
+        // now that we have a map to reference, loop through the original inputs
+        // for each input's bind field, loop through the bind values, and add those matching records to a list to output
         
         List <FlowOutput> outputs = new List <FlowOutput> ();
         
@@ -85,7 +76,6 @@ global with sharing class GetRecordsInCollection {
             outputs.add(output);
         }
         
-        // right now it returns all return fields to all inputs, even if different inputs requested different fields. this might be just fine.
         return outputs;
     }
     
