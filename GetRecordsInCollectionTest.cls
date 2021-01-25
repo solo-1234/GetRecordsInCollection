@@ -1,7 +1,6 @@
 @isTest
 private class GetRecordsInCollectionTest {
-
-    
+   
     @testSetup
     static void testSetup(){
         List <Lead> leads = new List <Lead> ();
@@ -49,9 +48,9 @@ private class GetRecordsInCollectionTest {
         List<String> validTextCollection = new List <String> {'Hot','Warm'};
         List <GetRecordsInCollection.FlowInput> inputList = prepSingleInputList('Nothing','No_Field__c',validTextCollection);
         Boolean hasError = false;
-        try{
+        try {
             List <Lead> leadList = GetRecordsInCollection.GetRecordsInCollection(inputList)[0].matchingRecords;
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             hasError = true;
         }
         System.assert(hasError,'Should throw an exception if the object is invalid');
@@ -78,18 +77,16 @@ private class GetRecordsInCollectionTest {
         input.returnFields = new List<String> {'Id','Rating'};
         input.bindField = 'rating';
         input.validTextCollection = new List<String> {'Hot','Warm'};        
-
         GetRecordsInCollection.FlowInput input2 = input.clone();
         input2.objectName = 'Contact';
-        
         List <GetRecordsInCollection.FlowInput> inputList = new List <GetRecordsInCollection.FlowInput> {input, input2};
         Boolean hasError = false;
         try{
             List <Lead> leadList = GetRecordsInCollection.GetRecordsInCollection(inputList)[0].matchingRecords;
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             hasError = true;
         }
-        System.assert(hasError,'Should throw an exception if batched requests reference different objects');
+        System.assert(hasError, 'Should throw an exception if batched requests reference different objects');
     }
     
     @IsTest
@@ -105,7 +102,7 @@ private class GetRecordsInCollectionTest {
         List <GetRecordsInCollection.FlowOutput> flowOutputs = GetRecordsInCollection.GetRecordsInCollection(inputList);
         Integer numQueries = Limits.getQueries();
         Test.stopTest();
-        System.assertEquals(1, numQueries,'Should execute one query even with multiple requests');
+        System.assertEquals(1, numQueries, 'Should execute one query even with multiple requests');
     }
     
     
@@ -116,11 +113,9 @@ private class GetRecordsInCollectionTest {
         input.returnFields = new List<String> {'Id','Rating'};
         input.bindField = 'Rating';
         input.validTextCollection = new List<String> {'Hot','Warm'};        
-
         GetRecordsInCollection.FlowInput input2 = input.clone();
         input2.bindField = 'Company';
         input2.validTextCollection = new List <String> {'company','nothing'};
-        
         List <GetRecordsInCollection.FlowInput> inputList = new List <GetRecordsInCollection.FlowInput> {input, input2};
         Test.startTest();
         List <GetRecordsInCollection.FlowOutput> flowOutputs = GetRecordsInCollection.GetRecordsInCollection(inputList);
@@ -130,7 +125,6 @@ private class GetRecordsInCollectionTest {
         GetRecordsInCollection.FlowOutput secondResult = flowOutputs[1];
         System.assertEquals(5, firstResult.matchingRecords.size(), 'Should find 5 leads with rating hot or warm');
         System.assertEquals(8, secondResult.matchingRecords.size(), 'Should find 8 leads with company: company');
-        
         Test.stopTest();
     }
     
