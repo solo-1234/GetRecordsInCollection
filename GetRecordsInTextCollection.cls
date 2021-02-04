@@ -9,6 +9,7 @@ global with sharing class GetRecordsInTextCollection {
         validateInputs(inputs); // throw an error if there's an issue, otherwise continue
 
         for (FlowInput input : inputs) {
+            // If no bind key is selected, use the default of 'id'
             if (input.bindField == null) {
                 input.bindField = 'id';
             }
@@ -35,11 +36,15 @@ global with sharing class GetRecordsInTextCollection {
                     allReturnFields.add(field.toLowerCase());
                 }
             } else {
+                // If no fields were selected, add all accessible fields
                 Schema.SObjectType targetType = Schema.getGlobalDescribe()
                     .get(input.objectName);
-                allReturnFields.addAll(
-                    targetType.getDescribe().fields.getMap().keySet()
-                );
+                for (Schema.SObjectField field : targetType.getDescribe().fields.getMap().values()) {
+                    Schema.DescribeFieldResult dfr = field.getDescribe();
+                    if (dfr.isAccessible()) {
+                        allReturnFields.add(dfr.getName().toLowerCase());
+                    }
+                }
             }
         }
 
