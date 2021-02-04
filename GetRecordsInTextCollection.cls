@@ -1,10 +1,9 @@
 global with sharing class GetRecordsInTextCollection {
     @InvocableMethod
-    global static List<FlowOutput> GetRecordsInTextCollection(
-        List<FlowInput> inputs
-    ) {
-        Map<String, List<FlowInput>> fieldNameToInputs = new Map<String, List<FlowInput>>();
-        Map<String, Set<String>> fieldNameToValidValues = new Map<String, Set<String>>();
+    global static List<FlowOutput> GetRecordsInTextCollection(List<FlowInput> inputs){
+         
+        Map<String,List<FlowInput>> fieldNameToInputs = new Map<String,List<FlowInput>>();
+        Map<String, Set<String>> fieldNameToValidValues = new Map<String, Set<String>> ();
         Set<String> allReturnFields = new Set<String>();
 
         validateInputs(inputs); // throw an error if there's an issue, otherwise continue

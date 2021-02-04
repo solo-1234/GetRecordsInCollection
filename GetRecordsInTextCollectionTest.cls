@@ -21,12 +21,6 @@ private class GetRecordsInTextCollectionTest {
     }
     
     @IsTest
-    static void testSetup_HasEightAccounts() {
-        List <Account> accountList = [SELECT Id FROM Account WHERE AccountNumber = '123'];
-        System.assertEquals(8, accountList.size(),'Should insert 8 accounts');
-    }
-    
-    @IsTest
     static void getRecords_AccountsInUS_Three() {
         List<String> validTextCollection = new List <String> {'US'};
         List <GetRecordsInTextCollection.FlowInput> inputList = prepSingleInputList('Account','Site',validTextCollection);
@@ -122,7 +116,7 @@ private class GetRecordsInTextCollectionTest {
         List <GetRecordsInTextCollection.FlowOutput> flowOutputs = GetRecordsInTextCollection.GetRecordsInTextCollection(inputList);
         Integer numQueries = Limits.getQueries();
         System.assertEquals(1, numQueries,'Should execute one query even with multiple requests');
-    	  GetRecordsInTextCollection.FlowOutput firstResult = flowOutputs[0];
+        GetRecordsInTextCollection.FlowOutput firstResult = flowOutputs[0];
         GetRecordsInTextCollection.FlowOutput secondResult = flowOutputs[1];
         System.assertEquals(5, firstResult.matchingRecords.size(), 'Should find 5 accounts with site US or CA');
         System.assertEquals(8, secondResult.matchingRecords.size(), 'Should find 8 accounts with Account Number: 123');
