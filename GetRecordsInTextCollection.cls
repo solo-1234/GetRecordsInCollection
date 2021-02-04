@@ -1,4 +1,4 @@
-global with sharing class GetRecordsInCollection {
+global with sharing class GetRecordsInTextCollection {
 
     @InvocableMethod
     global static List<FlowOutput> GetRecordsInCollection(List<FlowInput> inputs){
