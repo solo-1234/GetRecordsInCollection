@@ -1,7 +1,7 @@
 global with sharing class GetRecordsInTextCollection {
 
     @InvocableMethod
-    global static List<FlowOutput> GetRecordsInCollection(List<FlowInput> inputs){
+    global static List<FlowOutput> GetRecordsInTextCollection(List<FlowInput> inputs){
          
         Map<String,List<FlowInput>> fieldNameToInputs = new Map<String,List<FlowInput>>();
         Map<String, Set<String>> fieldNameToValidValues = new Map<String, Set<String>> ();
