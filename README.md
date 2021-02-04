@@ -1,4 +1,4 @@
-# GetRecordsInCollection
+# GetRecordsInTextCollection
 This Invocable Action mimics the built in Get Records element, and allows you to find records where a field matches one of a list of valid values.
 
 ## Inputs
