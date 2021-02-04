@@ -1,5 +1,5 @@
 @isTest
-private class GetRecordsInCollectionTest {
+private class GetRecordsInTextCollectionTest {
     
     @testSetup
     static void testSetup(){
