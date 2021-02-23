@@ -10,6 +10,12 @@ global with sharing class GetRecordsInTextCollection {
         validateInputs(inputs); // throw an error if there's an issue, otherwise continue
         
         for(FlowInput input : inputs){
+            // If no bind key is selected, use the default of 'id'
+            if (input.bindField == null) {
+                input.bindField = 'id';
+            }
+            input.bindField = input.bindField.toLowerCase();
+
             // add the valid field values for this input to a map of field name to a set of valid values
             if (!fieldNameToValidValues.containsKey(input.bindField)){
                 fieldNameToValidValues.put(input.bindField, new Set<String>());
@@ -26,7 +32,24 @@ global with sharing class GetRecordsInTextCollection {
             // add all the return fields to a set (in case different interviews request different fields)
             // note that we will return all fields for all the records. 
             // Most of the time, all the interviews will request the same fields. Even if not, the user is not likely to notice, and we don't anticipate performance issues.
-            allReturnFields.addAll(input.returnFields);
+
+            //if input.returnFields is null, return all accessible fields
+            if (input.returnFields != null) {
+                for (String field : input.returnFields) {
+                    allReturnFields.add(field.toLowerCase());
+                }
+            } else {
+                // If no fields were selected, add all accessible fields
+                Schema.SObjectType targetType = Schema.getGlobalDescribe()
+                    .get(input.objectName);
+                for (Schema.SObjectField field : targetType.getDescribe().fields.getMap().values()) {
+                    Schema.DescribeFieldResult dfr = field.getDescribe();
+                    if (dfr.isAccessible()) {
+                        allReturnFields.add(dfr.getName().toLowerCase());
+                    }
+                }
+            }
+
         }
         
         // build the soql
