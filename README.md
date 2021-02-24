@@ -3,8 +3,8 @@ This Invocable Action mimics the built in Get Records element, and allows you to
 
 ## Inputs
 * **objectName:** the object to search for
-* **returnFields:** the list of fields to return, in a Text Collection variable (this will correspond to the list of fields after `SELECT` in a soql query
-* **bindField:** the field on which we would like to filter our query
+* **returnFields:** the list of fields to return, in a Text Collection variable (this will correspond to the list of fields after `SELECT` in a soql query) (if blank, will default to all accessible fields)
+* **bindField:** the field on which we would like to filter our query (if blank, will default to `Id`)
 * **validTextCollection:** a Text Collection of the valid values in the field **bindField**
 
 ## In short
