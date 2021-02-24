@@ -37,6 +37,16 @@ private class GetRecordsInTextCollectionTest {
     }
     
     @IsTest
+    static void getRecords_AccountsByIdNoFields_Three() {
+        List <Account> accs = [SELECT Id FROM Account LIMIT 3];
+        List <String> validIds = new List <String> {accs[0].Id, accs[1].Id, accs[2].Id};
+        List <GetRecordsInTextCollection.FlowInput> inputList = prepSingleInputList('Account',null,validIds);
+        inputList[0].returnFields = null;
+        List <Account> accountList = GetRecordsInTextCollection.GetRecordsInTextCollection(inputList)[0].matchingRecords;
+        System.assertEquals(3, accountList.size(),'Should find 3 accounts matched on id');
+    }
+    
+    @IsTest
     static void getRecords_InvalidObject_ThrowError() {
         List<String> validTextCollection = new List <String> {'US','CA'};
         List <GetRecordsInTextCollection.FlowInput> inputList = prepSingleInputList('Nothing','No_Field__c',validTextCollection);
