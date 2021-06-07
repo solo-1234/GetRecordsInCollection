@@ -18,6 +18,17 @@ private class GetRecordsInTextCollectionTest {
         accounts[6].site = 'UK';
         
         insert accounts;
+        
+        Account a6 = new Account();
+        a6.id = accounts[6].Id;
+        a6.ParentId = accounts[5].Id;
+        update a6;
+        
+        Case c = new Case();
+        c.subject = 'Testing 123';
+        c.accountid = accounts[6].id;
+        insert c;
+            
     }
     
     @IsTest
@@ -130,6 +141,24 @@ private class GetRecordsInTextCollectionTest {
         GetRecordsInTextCollection.FlowOutput secondResult = flowOutputs[1];
         System.assertEquals(5, firstResult.matchingRecords.size(), 'Should find 5 accounts with site US or CA');
         System.assertEquals(8, secondResult.matchingRecords.size(), 'Should find 8 accounts with Account Number: 123');
+        Test.stopTest();
+    }
+    
+    @IsTest
+    static void getRecords_Parents() {
+        GetRecordsInTextCollection.FlowInput input = new GetRecordsInTextCollection.FlowInput();
+        input.objectName = 'Case';
+        input.returnFields = new List<String> {'Id','Account.Name', 'Account.Parent.Name'};
+        input.bindField = 'Account.Parent.Name';
+        input.validTextCollection = new List<String> {'account 6'};        
+        
+        List <GetRecordsInTextCollection.FlowInput> inputList = new List <GetRecordsInTextCollection.FlowInput> {input};
+        Test.startTest();
+        List <GetRecordsInTextCollection.FlowOutput> flowOutputs = GetRecordsInTextCollection.GetRecordsInTextCollection(inputList);
+        Integer numQueries = Limits.getQueries();
+        System.assertEquals(1, numQueries,'Should execute one query even with multiple requests');
+        GetRecordsInTextCollection.FlowOutput firstResult = flowOutputs[0];
+        System.assertEquals(1, firstResult.matchingRecords.size(), 'Should find 1 case with a parent account named account 6');
         Test.stopTest();
     }
     

@@ -70,7 +70,14 @@ global with sharing class GetRecordsInTextCollection {
         for (sObject record : foundRecords){
             for (String bindField : fieldNameToValidValues.keySet()){
                 System.debug('>>>> bind field is ' + bindField + '. Will fetch value from record: ' + record);
-                String fieldVal = record.get(bindField)?.toString(); //do we want this to work on non-text fields?
+                String fieldVal = '';
+                if(bindField.contains('.')){
+			       fieldVal = getOriginalField(record, bindField);
+                    system.debug('fieldVal ' + fieldVal);
+                } else {
+                   fieldVal = record.get(bindField)?.toString(); //do we want this to work on non-text fields?
+                }
+                 
                 // add a key for this field value if necessary
                 if (!bindFieldToValueToRecordsMap.get(bindField).containsKey(fieldVal)){
                     bindFieldToValueToRecordsMap.get(bindField).put(fieldVal, new List <sObject> ());
@@ -140,6 +147,48 @@ global with sharing class GetRecordsInTextCollection {
         String objName = new List<String> (objNames)[0];
         if((Type.forName(objName)?.newInstance() instanceof SObject) == false){
             throw new IllegalArgumentException (objName + ' is not a valid object');
+        }
+    }
+    
+    /*
+     * @description returns original field api name in relationship query
+     * @param fieldName current field name
+     * @return string
+     */
+    private static string getOriginalField(string fieldName){
+        if(fieldName.contains('__r')){
+            fieldName = fieldName.replace('__r', '__c');
+        } else {
+            fieldName = fieldName;
+        }
+        return fieldName;
+    }
+    
+    /*
+     * @description returns original field value
+     * @param sobj generic sobject
+     * @param fieldName current field name
+     * @return string
+     */
+    private static string getOriginalField(sobject sobj, string fieldName){
+        if(fieldName.contains('.')){
+            List<String> stringList = fieldName.split('\\.');
+            system.debug(fieldName);
+            system.debug(stringList);
+            string originalObject = getOriginalField(stringList[0]);
+            string originalField = getOriginalField(stringList[1]);
+            system.debug('Original Object: ' + originalObject + ' Original Field: ' + originalField);
+            if(fieldName.split('\\.').size() > 2){
+                integer index = fieldName.indexOf('.') + 1;
+                string nextField = fieldName.substring(index, (fieldName.length()));
+                string retVal = getOriginalField(sobj.getSobject(originalObject), nextField);
+                return retVal;
+            } else{
+                string retVal = String.ValueOf(sobj.getSobject(originalObject).get(originalField));
+                return retVal;
+            }
+        } else{
+            return string.valueOf(sobj.get(fieldName));
         }
     }
    
