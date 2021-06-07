@@ -40,8 +40,7 @@ global with sharing class GetRecordsInTextCollection {
                 }
             } else {
                 // If no fields were selected, add all accessible fields
-                Schema.SObjectType targetType = Schema.getGlobalDescribe()
-                    .get(input.objectName);
+				Schema.SObjectType targetType = ((SObject) Type.forName(input.objectName).newInstance()).getSObjectType();
                 for (Schema.SObjectField field : targetType.getDescribe().fields.getMap().values()) {
                     Schema.DescribeFieldResult dfr = field.getDescribe();
                     if (dfr.isAccessible()) {
