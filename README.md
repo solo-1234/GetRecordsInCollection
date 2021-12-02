@@ -1,6 +1,7 @@
 # GetRecordsInTextCollection
 This Invocable Action mimics the built in Get Records element, and allows you to find records where a field matches one of a list of valid values.
-Note: This requires the Extract Strings from Collection (USF) action. See: https://unofficialsf.com/from-ragan-walker-and-captech-easy-deduping-with-the-new-extract-strings-from-collection-actions/.
+
+Note: If you'd like to use this action to retrieve records that match a specific field's value in a collection of records, you can prepend it with the Extract Strings from Collection (USF) action. See: https://unofficialsf.com/from-ragan-walker-and-captech-easy-deduping-with-the-new-extract-strings-from-collection-actions/.
 
 ## Inputs
 * **objectName:** the object to search for
