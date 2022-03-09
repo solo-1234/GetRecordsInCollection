@@ -18,5 +18,7 @@ This action is bulkified. That means that if a flow runs on a batch of records (
 ## Limitations
 When this action runs on batches of records (see **Bulkification**), it does not support batches where different records request different **objectName**s. This is due to how the action is bulkified.
 
+You may encounter an error when a flow tries to access a field which is null on a record. This is due to a limitation with dynamic soql not including null fields in its results. To avoid this issue, do not leave `returnFields` blank. The action will then check for null in those fields so that it can be properly returned to the flow.
+
 ## Feedback
 Any and all feedback is welcome!
