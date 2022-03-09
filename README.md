@@ -1,7 +1,7 @@
 # GetRecordsInCollection
 This Invocable Action mimics the built in Get Records element, and allows you to find records where a field matches one of a list of valid values.
 
-Note: The GetRecordsInTextCollection class has been replaced with GetRecordsInCollection which allows you to either pass in a list of valid values to search for, OR a record collection and a field name if you'd like to search for any of the values in that field for all the records in the collection.
+Note: The GetRecordsInTextCollection class has been replaced with GetRecordsInCollection which allows you to either pass in a list of valid values to search for, OR a record collection and a field name if you'd like to search for any of the values in that field for all the records in the collection. The original class is left here for reference purposes.
 
 ## Inputs
 * **objectName:** the object to search for
